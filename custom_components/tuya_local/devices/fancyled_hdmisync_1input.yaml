@@ -1,0 +1,221 @@
+name: HDMI sync backlight (single input)
+products:
+  - id: knxyr5g6qrpjqszj
+    manufacturer: Fancy LEDs
+    model: 1 HDMI 2.1 sync box
+entities:
+  - entity: light
+    dps:
+      - id: 20
+        name: switch
+        type: boolean
+      - id: 22
+        name: brightness
+        type: integer
+        range:
+          min: 10
+          max: 1000
+      - id: 24
+        name: rgbhsv
+        type: hex
+        format:
+          - name: h
+            bytes: 2
+            range:
+              min: 0
+              max: 360
+          - name: s
+            bytes: 2
+            range:
+              min: 0
+              max: 1000
+          - name: w
+            bytes: 2
+            range:
+              min: 0
+              max: 1000
+      - id: 23
+        type: integer
+        optional: true
+        name: color_temp
+        range:
+          min: 0
+          max: 1000
+        mapping:
+          - target_range:
+              min: 2700
+              max: 6500
+      - id: 23
+        type: integer
+        optional: true
+        name: color_temp_supported
+        hidden: true
+        mapping:
+          - dps_val: null
+            value: false
+          - value: true
+      - id: 25
+        type: string
+        name: color_mode
+        mapping:
+          - dps_val: "88000000000000000000000000000000"
+            available: color_temp_supported
+            value: color_temp
+          - dps_val: "97000000000000000000000000000000"
+            value: hs
+          - value: hs
+            hidden: true
+  - entity: switch
+    name: Scene mode CEC
+    category: config
+    dps:
+      - id: 109
+        name: switch
+        type: boolean
+  - entity: select
+    name: Setup side
+    icon: "mdi:arrow-collapse-horizontal"
+    category: config
+    dps:
+      - id: 101
+        type: integer
+        name: option
+        mapping:
+          - dps_val: 0
+            value: Left
+          - dps_val: 1
+            value: Right
+  - entity: number
+    category: config
+    name: Degree of diffusion
+    mode: slider
+    dps:
+      - id: 108
+        name: value
+        type: integer
+        precision: 0
+        range:
+          min: 10
+          max: 1000
+        mapping:
+          - scale: 10
+            step: 10
+  # Saturation (Low/Medium/High in the app). The raw DP values are
+  # lowercase and case-sensitive: only "low"/"middle"/"high" are accepted.
+  - entity: select
+    name: Saturation
+    category: config
+    icon: "mdi:palette"
+    dps:
+      - id: 115
+        type: string
+        name: option
+        mapping:
+          - dps_val: low
+            value: Low
+          - dps_val: middle
+            value: Medium
+          - dps_val: high
+            value: High
+  # Wireless Sync Channel. Only CH1/CH2/CH3 are valid (CH4 is rejected).
+  - entity: select
+    name: Wireless sync channel
+    category: config
+    icon: "mdi:access-point"
+    dps:
+      - id: 120
+        type: string
+        name: option
+        mapping:
+          - dps_val: CH1
+            value: CH1
+          - dps_val: CH2
+            value: CH2
+          - dps_val: CH3
+            value: CH3
+  # Ambient Backlight. Three-state in the app: Off / Always / Mixed.
+  # The wire value for the app's "Always" state is "On".
+  - entity: select
+    name: Ambient backlight
+    category: config
+    icon: "mdi:wall-sconce-flat"
+    dps:
+      - id: 121
+        type: string
+        name: option
+        mapping:
+          # Quote the values: YAML 1.1 treats bare Off/On as booleans.
+          - dps_val: "Off"
+            value: "Off"
+          - dps_val: "On"
+            value: "Always"
+          - dps_val: "Mixed"
+            value: "Mixed"
+  - entity: select
+    translation_key: scene
+    category: config
+    dps:
+      - id: 25
+        type: string
+        name: option
+        mapping:
+          # Movie/Leisure/Gaming (8000/8100/8200) are just shortcuts to the
+          # Degree-of-diffusion slider (DP108), so they are intentionally
+          # omitted here. The sync diffusion is controlled directly by DP108.
+          - dps_val: "98000000000000000000000000000000"
+            value: Music - Classic
+          - dps_val: "99000000000000000000000000000000"
+            value: Music - Pop
+          - dps_val: "9A000000000000000000000000000000"
+            value: Music - Rock
+          - dps_val: "9B000000000000000000000000000000"
+            value: Music - Absolute
+          - dps_val: "9C000000000000000000000000000000"
+            value: Music - Electror
+          - dps_val: "9D000000000000000000000000000000"
+            value: Music - Ambient
+          - dps_val: "86000000000000000000000000000000"
+            value: Scene - Rainbow
+          - dps_val: "87000000000000000000000000000000"
+            value: Scene - Fire
+          - dps_val: "88000000000000000000000000000000"
+            value: reading
+          - dps_val: "89000000000000000000000000000000"
+            value: Scene - Firework
+          - dps_val: "90000000000000000000000000000000"
+            value: Scene (Color) - Star
+          - dps_val: "91000000000000000000000000000000"
+            value: Scene (Color) - Drip
+          - dps_val: "92000000000000000000000000000000"
+            value: Scene (Color) - Practice
+          - dps_val: "93000000000000000000000000000000"
+            value: Scene (Color) - Flow
+          - dps_val: "94000000000000000000000000000000"
+            value: Scene (Color) - Ball
+          - dps_val: "95000000000000000000000000000000"
+            value: Scene (Color) - Swing
+          - dps_val: "96000000000000000000000000000000"
+            value: Scene (Color) - Breath
+          - dps_val: "97000000000000000000000000000000"
+            value: Scene (Color) - Pure
+  - entity: number
+    name: HDR level
+    category: config
+    icon: "mdi:hdr"
+    hidden: unavailable
+    dps:
+      - id: 113
+        type: integer
+        optional: true
+        name: value
+        range:
+          min: 0
+          max: 1000
+      - id: 113
+        type: integer
+        optional: true
+        name: available
+        mapping:
+          - dps_val: null
+            value: false
+          - value: true
